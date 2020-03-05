@@ -72,5 +72,5 @@ def allmaps(request):
     all_rooms = Room.objects.all()
     res = {}
     for i in all_rooms:
-        res[i.id] = {'x_pos': i.move_x, 'y_pos':i.move_y, 'room_type':i.roomtype}
+        res[i.id] = {'x_pos': i.move_x, 'y_pos':i.move_y}
     return JsonResponse(res)
