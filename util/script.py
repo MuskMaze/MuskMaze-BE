@@ -19,12 +19,12 @@ for n in a[1]:
     r[count-1] = Room(id=count,move_x=n[0],move_y=n[1])
     r[count-1].save()
     count+=1
-
+print(r)
 for element in a[1]:
     east = (element[0] , element[1]+1)
     west = (element[0] , element[1]-1)
-    north = (element[0]+1 , element[1])
-    south = (element[0]-1, element[1])
+    north = (element[0]-1 , element[1])
+    south = (element[0]+1, element[1])
    
     if east in a[1]:
         r[a[1].index(element)].connectRooms(r[a[1].index(east)],"e")
