@@ -1,47 +1,46 @@
+
+
 from django.contrib.auth.models import User
 from adventure.models import Player, Room
 
-
 Room.objects.all().delete()
 
-r_outside = Room(title="Outside Cave Entrance",
-               description="North of you, the cave mount beckons")
+# let's create the rooms
+r_outside = Room(title="Outside the Sci-Fi Headquarter of SpaceX",
+                description="East of you, SpaceX entrance is laid with prototypes of Merlin Engine")
+r_lobby = Room(title="Lobby",
+                description="The lobby is brightly lit with red and white lights lining the walls")
+# r_overlook = Room(title="The Dome",
+#                 description="The Dome is the shape of an oval cut in half, with glass ceiling look at the galaxy above and beyond")
+r_ornament = Room(title="Hangings",
+                description="With the dome hangs a booster stage of first Falcon 9 Rocket")
+r_center = Room(title="Focus",
+                description="There, in the middle of it all, lies a Dragon Capsule that took astronauts to ISS for the first time")
+r_treasure = Room(title="Unknown",
+                description = "We do not know the location of this room and will find it in objects but, this is where Elon will build Improbability Drive")
 
-r_foyer = Room(title="Foyer", description="""Dim light filters in from the south. Dusty
-passages run north and east.""")
-
-r_overlook = Room(title="Grand Overlook", description="""A steep cliff appears before you, falling
-into the darkness. Ahead to the north, a light flickers in
-the distance, but there is no way across the chasm.""")
-
-r_narrow = Room(title="Narrow Passage", description="""The narrow passage bends here from west
-to north. The smell of gold permeates the air.""")
-
-r_treasure = Room(title="Treasure Chamber", description="""You've found the long-lost treasure
-chamber! Sadly, it has already been completely emptied by
-earlier adventurers. The only exit is to the south.""")
 
 r_outside.save()
-r_foyer.save()
-r_overlook.save()
-r_narrow.save()
+r_lobby.save()
+# r_overlook.save()
+r_ornament.save()
+r_center.save()
 r_treasure.save()
 
-# Link rooms together
-r_outside.connectRooms(r_foyer, "n")
-r_foyer.connectRooms(r_outside, "s")
+r_outside.connectRooms(r_lobby, "n")
+r_lobby.connectRooms(r_outside, "s")
 
-r_foyer.connectRooms(r_overlook, "n")
-r_overlook.connectRooms(r_foyer, "s")
+r_lobby.connectRooms(r_ornament, "n")
+r_ornament.connectRooms(r_lobby, "s")
 
-r_foyer.connectRooms(r_narrow, "e")
-r_narrow.connectRooms(r_foyer, "w")
+r_ornament.connectRooms(r_center, "w")
+r_center.connectRooms(r_ornament, "e")
 
-r_narrow.connectRooms(r_treasure, "n")
-r_treasure.connectRooms(r_narrow, "s")
+r_center.connectRooms(r_treasure, "w")
+r_treasure.connectRooms(r_center, "e")
 
-players=Player.objects.all()
+
+players = Player.objects.all()
 for p in players:
-  p.currentRoom=r_outside.id
-  p.save()
-
+    p.currentRoom=r_outside.id
+    p.save() 
