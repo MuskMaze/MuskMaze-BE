@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from adventure.models import Player, Room
 import random
 Room.objects.all().delete()
+Player.objects.all().delete()
 (138, {'adventure.Room': 138})
 CHARACTER_TILES = {'wall': '0',
                    'floor': '1'}
