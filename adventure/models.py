@@ -9,7 +9,7 @@ class Room(models.Model):
     id = models.IntegerField(primary_key = True, default=0)
     title = models.CharField(max_length=50, default="DEFAULT TITLE")
     description = models.CharField(max_length=500, default="DEFAULT DESCRIPTION")
-    roomtype = models.IntegerField(default=1)
+    # roomtype = models.IntegerField(default=1)
     n_to = models.IntegerField(default=0)
     s_to = models.IntegerField(default=0)
     e_to = models.IntegerField(default=0)
@@ -66,3 +66,4 @@ def create_user_player(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_player(sender, instance, **kwargs):
     instance.player.save()
+

@@ -72,5 +72,9 @@ def allmaps(request):
     all_rooms = Room.objects.all()
     res = {}
     for i in all_rooms:
-        res[i.id] = {'x_pos': i.move_x, 'y_pos':i.move_y}
+        res[i.id] = {'id':i.id,'x_pos': i.move_x, 'y_pos':i.move_y}
     return JsonResponse(res)
+
+# @api_view(["GET"])
+# def get_rooms(request):
+#     return JsonResponse({"rooms": list(Room.objects.values().order_by('id'))})

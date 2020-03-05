@@ -1,10 +1,7 @@
 from django.contrib.auth.models import User
 from adventure.models import Player, Room
-
-Room.objects.all().delete()
-
-from __future__ import print_function
 import random
+Room.objects.all().delete()
  
 CHARACTER_TILES = {'wall': '0',
                    'floor': '1'}
@@ -66,7 +63,6 @@ class World:
             elif join is 'bottom':
                 return [(x1, y1), (x2, y1), (x2, y2)]
     def join_rooms(self, room_1, room_2, join_type='either'):
-        # sort by the value of x
         sorted_room = [room_1, room_2]
         sorted_room.sort(key=lambda x_y: x_y[0])
         x1 = sorted_room[0][0]
@@ -81,7 +77,6 @@ class World:
         h2 = sorted_room[1][3]
         x2_2 = x2 + w2 - 1
         y2_2 = y2 + h2 - 1
-        # overlapping on x
         if x1 < (x2 + w2) and x2 < (x1 + w1):
             jx1 = random.randint(x2, x1_2)
             jx2 = jx1
@@ -91,7 +86,6 @@ class World:
             jy2 = tmp_y[2] - 1
             corridors = self.corridor_between_points(jx1, jy1, jx2, jy2)
             self.corridor_list.append(corridors)
-        # overlapping on y
         elif y1 < (y2 + h2) and y2 < (y1 + h1):
             if y2 > y1:
                 jy1 = random.randint(y2, y1_2)
@@ -103,17 +97,14 @@ class World:
             tmp_x.sort()
             jx1 = tmp_x[1] + 1
             jx2 = tmp_x[2] - 1
- 
             corridors = self.corridor_between_points(jx1, jy1, jx2, jy2)
             self.corridor_list.append(corridors)
-        # no overlap
         else:
             join = None
             if join_type is 'either':
                 join = random.choice(['top', 'bottom'])
             else:
                 join = join_type
- 
             if join is 'top':
                 if y2 > y1:
                     jx1 = x1_2 + 1
@@ -131,7 +122,6 @@ class World:
                     corridors = self.corridor_between_points(
                         jx1, jy1, jx2, jy2, 'top')
                     self.corridor_list.append(corridors)
- 
             elif join is 'bottom':
                 if y2 > y1:
                     jx1 = random.randint(x1, x1_2)
@@ -150,43 +140,32 @@ class World:
                         jx1, jy1, jx2, jy2, 'bottom')
                     self.corridor_list.append(corridors)
     def gen_level(self):
-        # build an empty dungeon, blank the room and corridor lists
         for i in range(self.height):
             self.level.append(['wall'] * self.width)
         self.room_list = []
         self.corridor_list = []
- 
         max_iters = self.max_rooms * 5
- 
         for a in range(max_iters):
             tmp_room = self.gen_room()
- 
             if self.rooms_overlap or not self.room_list:
                 self.room_list.append(tmp_room)
             else:
                 tmp_room = self.gen_room()
                 tmp_room_list = self.room_list[:]
- 
                 if self.room_overlapping(tmp_room, tmp_room_list) is False:
                     self.room_list.append(tmp_room)
- 
             if len(self.room_list) >= self.max_rooms:
                 break
-        # connect the rooms
         for a in range(len(self.room_list) - 1):
             self.join_rooms(self.room_list[a], self.room_list[a + 1])
-        # do the random joins
         for a in range(self.random_connections):
             room_1 = self.room_list[random.randint(0, len(self.room_list) - 1)]
             room_2 = self.room_list[random.randint(0, len(self.room_list) - 1)]
             self.join_rooms(room_1, room_2)
-        # fill the map
-        # paint rooms
         for room_num, room in enumerate(self.room_list):
             for b in range(room[2]):
                 for c in range(room[3]):
                     self.level[room[1] + c][room[0] + b] = 'floor'
-        # paint corridors
         for corridor in self.corridor_list:
             x1, y1 = corridor[0]
             x2, y2 = corridor[1]
@@ -196,7 +175,6 @@ class World:
                         min(x1, x2) + width] = 'floor'
             if len(corridor) == 3:
                 x3, y3 = corridor[2]
- 
                 for width in range(abs(x2 - x3) + 1):
                     for height in range(abs(y2 - y3) + 1):
                         self.level[min(y2, y3) + height][
@@ -222,35 +200,3 @@ class World:
                     list_rooms.append((n,x))
         return(tiles,list_rooms)
 
-ancho = 20
-alto = 15
-gen = World(width=ancho, height=alto, max_rooms=15)
-gen.gen_level()
-a = gen.gen_tiles_level()
-
-count=1
-r=[None]*len(a[1])
-for n in a[1]:
-    r[count-1] = Room(id=count,move_x=n[0],move_y=n[1])
-    r[count-1].save()
-    count+=1
-
-for element in a[1]:
-    east = [element[0] , element[1]+1]
-    west = [element[0] , element[1]-1]
-    north = [element[0]+1 , element[1]]
-    south = [element[0]-1, element[1]+1]
-    if east in a[1]:
-        r[a[1].index(element)].connectRooms(r[a[1].index(east)][0],"e")
-    if west in a[1]:
-        r[a[1].index(element)].connectRooms(r[a[1].index(west)][0],"w")
-    if north in a[1]:
-        r[a[1].index(element)].connectRooms(r[a[1].index(north)][0],"n")
-    if south in a[1]:
-        r[a[1].index(element)].connectRooms(r[a[1].index(south)][0],"s")
-
-
-players = Player.objects.all()
-for p in players:
-    p.currentRoom=r[0].id
-    p.save() 
